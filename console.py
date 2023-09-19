@@ -73,8 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
-                            and type(eval(pline)) is dict:
+                    if pline[0] is '{' and pline[-1] is'}' and type(eval(pline)) is dict:
                         _args = pline
                     else:
                         _args = pline.replace(',', '')
@@ -113,15 +112,49 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
+    def do_create(self, arg):
+        """ Create an object of any class with parameters """
+        if not arg:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+
+        args = arg.split()
+
+        class_name = args[0]
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
+
+        args = args[1:]  # Remove class name from args
+        params = {}
+        for param in args:
+            param_parts = param.split('=')
+            if len(param_parts) != 2:
+                continue  # Skip invalid parameters
+
+            key, value = param_parts
+            key = key.replace('_', ' ')  # Replace underscores with spaces
+
+            # Check value type based on syntax
+            if value.startswith('"') and value.endswith('"'):
+                # String: Remove double quotes and escape backslashes
+                value = value[1:-1].replace('\\"', '"').replace('\\', '\\\\')
+            elif '.' in value:
+                # Float: Parse as float
+                try:
+                    value = float(value)
+                except ValueError:
+                    continue  # Skip invalid float values
+            elif value.isdigit() or (value[0] == '-' and value[1:].isdigit()):
+                # Integer: Parse as integer
+                value = int(value)
+            else:
+                continue  # Skip unrecognized values
+
+            params[key] = value
+
+        # Create an instance of the class with the parsed parameters
+        new_instance = HBNBCommand.classes[class_name](**params)
         storage.save()
         print(new_instance.id)
         storage.save()
