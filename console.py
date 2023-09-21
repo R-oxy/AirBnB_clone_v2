@@ -73,7 +73,8 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}' and type(eval(pline)) is dict:
+                    if pline[0] is '{' and pline[-1] is'}' and type(
+                            eval(pline)) is dict:
                         _args = pline
                     else:
                         _args = pline.replace(',', '')
@@ -112,52 +113,34 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, arg):
-        """ Create an object of any class with parameters """
-        if not arg:
+    def do_create(self, args):
+        """ Create an object of any class"""
+        if not args:
             print("** class name missing **")
             return
-
-        args = arg.split()
-
-        class_name = args[0]
-        if class_name not in HBNBCommand.classes:
+        params = args.split()
+        if params[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        args = args[1:]  # Remove class name from args
-        params = {}
-        for param in args:
-            param_parts = param.split('=')
-            if len(param_parts) != 2:
-                continue  # Skip invalid parameters
-
-            key, value = param_parts
-            key = key.replace('_', ' ')  # Replace underscores with spaces
-
-            # Check value type based on syntax
-            if value.startswith('"') and value.endswith('"'):
-                # String: Remove double quotes and escape backslashes
-                value = value[1:-1].replace('\\"', '"').replace('\\', '\\\\')
-            elif '.' in value:
-                # Float: Parse as float
-                try:
-                    value = float(value)
-                except ValueError:
-                    continue  # Skip invalid float values
-            elif value.isdigit() or (value[0] == '-' and value[1:].isdigit()):
-                # Integer: Parse as integer
-                value = int(value)
+        new_instance = eval(params[0])()
+        for i in range(1, len(params)):
+            arg = params[i].split('=', 1)
+            value = ""
+            if arg[1][0] == '"' or arg[1][0] == "'":
+                value = arg[1][1:-1]
+                if '"' or "'" in value:
+                    value = value.replace('"', '\"')
+                if "_" in value:
+                    value = value.replace('_', ' ')
             else:
-                continue  # Skip unrecognized values
-
-            params[key] = value
-
-        # Create an instance of the class with the parsed parameters
-        new_instance = HBNBCommand.classes[class_name](**params)
-        storage.save()
+                try:
+                        value = int(arg[1])
+                except:
+                        continue
+            if value != "":
+                setattr(new_instance, arg[0], value)
         print(new_instance.id)
-        storage.save()
+        new_instance.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -232,17 +215,21 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
+        print_list = []
 
         if args:
             args = args.split(' ')[0]  # remove possible trailing args
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            objects = storage.all(args)
+            for k, v in storage.all(args).items():
+                if k.split('.')[0] == args:
+                    print_list.append(str(v))
         else:
-            objects = storage.all()
+            for k, v in storage.all().items():
+                print_list.append(str(v))
 
-        print([str(obj) for obj in objects.values()])
+        print(print_list)
 
     def help_all(self):
         """ Help information for the all command """
@@ -348,6 +335,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()

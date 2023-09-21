@@ -43,12 +43,14 @@ class DBStorage:
 
         # If cls is specified, query objects of that class
         else:
+            if type(cls) == str:
+                cls = eval(cls)
             objs = self.__session.query(cls)
 
         # Create a dictionary of objects
         obj_dict = {}
         for obj in objs:
-            key = f"{obj.__class__.__name__}.{obj.id}"
+            key = type(obj).__name__ + "." + obj.id
             obj_dict[key] = obj
 
         return obj_dict
@@ -71,7 +73,7 @@ class DBStorage:
         """Create all tables in the database and create current session"""
         Base.metadata.create_all(self.__engine)
         self.__session = scoped_session(sessionmaker(bind=self.__engine,
-                                                      expire_on_commit=False))
+                                                     expire_on_commit=False))
 
     def close(self):
         """Close the current session"""

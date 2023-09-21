@@ -6,12 +6,13 @@ from sqlalchemy.orm import relationship
 from models.city import City
 from models.user import User
 from os import getenv
+import models
 
 
 class Place(BaseModel, Base):
     """ A place to stay """
     __tablename__ = 'places'
-    
+
     if getenv("HBNB_TYPE_STORAGE") == "db":
         city_id = Column(String(60), ForeignKey(City.id), nullable=False)
         user_id = Column(String(60), ForeignKey(User.id), nullable=False)
@@ -23,9 +24,13 @@ class Place(BaseModel, Base):
         price_by_night = Column(Integer, nullable=False, default=0)
         latitude = Column(Float, nullable=True)
         longitude = Column(Float, nullable=True)
-        place_amenities = relationship("Amenity", secondary="place_amenity",back_populates="place_amenities", viewonly=False)
+        place_amenities = relationship("Amenity",
+                                       secondary="place_amenity",
+                                       back_populates="place_amenities",
+                                       viewonly=False)
         amenity_ids = []
-        reviews = relationship("Review", backref="place", cascade="all, delete-orphan")
+        reviews = relationship("Review", backref="place",
+                               cascade="all, delete-orphan")
     else:
         city_id = ""
         user_id = ""
@@ -52,11 +57,10 @@ class Place(BaseModel, Base):
         @property
         def amenities(self):
             """ Getter attribute for amenities in FileStorage """
-            from models import storage
             amenity_ids = self.amenity_ids
             amenities = []
             for amenity_id in amenity_ids:
-                amenity = storage.get(Amenity, amenity_id)
+                amenity = models.storage.get(Amenity, amenity_id)
                 if amenity:
                     amenities.append(amenity)
             return amenities
