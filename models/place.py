@@ -10,8 +10,9 @@ from os import getenv
 
 class Place(BaseModel, Base):
     """ A place to stay """
+    __tablename__ = 'places'
+    
     if getenv("HBNB_TYPE_STORAGE") == "db":
-        __tablename__ = 'places'
         city_id = Column(String(60), ForeignKey(City.id), nullable=False)
         user_id = Column(String(60), ForeignKey(User.id), nullable=False)
         name = Column(String(128), nullable=False)

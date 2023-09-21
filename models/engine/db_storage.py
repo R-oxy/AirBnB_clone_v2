@@ -2,7 +2,7 @@
 """DB storage class for AirBnB"""
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models.base_model import Base
+from models.base_model import BaseModel, Base
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -30,17 +30,27 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """Query all objects depending on the class name"""
-        obj_dict = {}
-        classes = [State, City, User, Place, Review, Amenity]
-        if cls:
-            classes = [cls]
+        """ Query on the current database session (self.__session) """
 
-        for c in classes:
-            objs = self.__session.query(c).all()
-            for obj in objs:
-                key = '{}.{}'.format(type(obj).__name__, obj.id)
-                obj_dict[key] = obj
+        # If cls is None, query all types of objects
+        if cls is None:
+            objs = self.__session.query(User).all()
+            objs.extend(self.__session.query(State).all())
+            objs.extend(self.__session.query(City).all())
+            objs.extend(self.__session.query(Place).all())
+            objs.extend(self.__session.query(Review).all())
+            objs.extend(self.__session.query(Amenity).all())
+
+        # If cls is specified, query objects of that class
+        else:
+            objs = self.__session.query(cls)
+
+        # Create a dictionary of objects
+        obj_dict = {}
+        for obj in objs:
+            key = f"{obj.__class__.__name__}.{obj.id}"
+            obj_dict[key] = obj
+
         return obj_dict
 
     def new(self, obj):

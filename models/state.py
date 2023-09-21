@@ -18,6 +18,8 @@ class State(BaseModel, Base):
     if getenv('HBNB_TYPE_STORAGE') == 'db':
         cities = relationship("City", backref="state", cascade="all, delete-orphan")
     else:
+        name = ""
+        
         @property
         def cities(self):
             """Returns the list of City instances with state_id equals to the current State.id"""
