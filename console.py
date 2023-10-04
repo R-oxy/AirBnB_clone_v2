@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}' and type(
+                    if pline[0] is '{' and pline[-1] is '}' and type(
                             eval(pline)) is dict:
                         _args = pline
                     else:
@@ -134,9 +134,10 @@ class HBNBCommand(cmd.Cmd):
                     value = value.replace('_', ' ')
             else:
                 try:
-                        value = int(arg[1])
-                except:
-                        continue
+                    value = int(arg[1])
+                except Exception as e:
+                    print(f"An error occurred: {e}")
+                    continue
             if value != "":
                 setattr(new_instance, arg[0], value)
         print(new_instance.id)

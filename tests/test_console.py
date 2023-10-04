@@ -10,6 +10,7 @@ from console import HBNBCommand
 from models.engine.db_storage import DBStorage
 from models.engine.file_storage import FileStorage
 
+
 class TestHBNBCommand(unittest.TestCase):
     """Unittests for testing the HBNB command interpreter."""
 
@@ -366,7 +367,7 @@ class TestHBNBCommand(unittest.TestCase):
             self.HBNB.onecmd("show State California")
             self.assertIn(
                 "[{}] {}".format(State.__name__,
-                                  eval(f.getvalue()).id), f.getvalue())
+                                 eval(f.getvalue()).id), f.getvalue())
             self.assertIn(
                 "'name': 'New York'", f.getvalue())
         with patch("sys.stdout", new=StringIO()) as f:
@@ -405,6 +406,7 @@ class TestHBNBCommand(unittest.TestCase):
         with patch("sys.stdout", new=StringIO()) as f:
             self.HBNB.onecmd('create State name="California"')
             self.assertNotEqual(output, f.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()
