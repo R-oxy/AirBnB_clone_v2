@@ -37,10 +37,6 @@ article {
 	display: flex;
 	justify-content: center;
 	align-self: flex-end;
-
-	position: absolute;
-	right: 0;
-
 	line-height: 60px;
 	color: #FF5A5F;
 	font-size: 30px;
@@ -50,6 +46,9 @@ article {
 	float: right;
 	min-width: 60px;
 	height: 60px;
+	position: absolute;
+	top: 0;
+	right: 0;
 }
 
 .information {

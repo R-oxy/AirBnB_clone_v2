@@ -28,4 +28,4 @@ def teardown_db(exception):
 
 if __name__ == '__main__':
     storage.reload()
-    app.run(host='0.0.0.0', port=5000)
+    app.run('0.0.0.0', 5000)
