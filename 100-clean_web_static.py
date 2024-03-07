@@ -6,7 +6,7 @@ Fabric script that deletes out-of-date archives.
 from fabric.api import local, env, run
 from datetime import datetime
 
-env.hosts = ['54.144.20.75', '100.26.151.157']
+env.hosts = ['107.21.38.215', '54.164.170.176']
 
 
 def do_clean(number=0):
